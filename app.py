@@ -8,7 +8,7 @@ df = pd.DataFrame(data)
 
 with st.sidebar:
     option = st.selectbox(
-        "What topic are REALLY you interested in ?",
+        "What topic are REALLYYY you interested in ?",
         ("Joins", "GroupBy", "Window Functions"),
         index=None,
         placeholder="Select a topic..."
