@@ -34,7 +34,7 @@ df = pd.DataFrame(data)
 
 with st.sidebar:
     option = st.selectbox(
-        "What would you like to review",
+        "What topic are you interested in ?",
         ("Joins", "GroupBy", "Window Functions"),
         index=None,
         placeholder="Select a topic..."
