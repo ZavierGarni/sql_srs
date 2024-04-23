@@ -6,14 +6,14 @@ import io
 csv = '''
 beverages, prices
 orange juice, 2.5
-expresso, 2
+expresso, 4
 tea, 3
 '''
 beverages = pd.read_csv(io.StringIO(csv))
 
 csv2 = '''
 food_item, food_price
-cookie, 2
+cookie, 4
 chocolatine, 2.5
 muffin, 3
 '''
