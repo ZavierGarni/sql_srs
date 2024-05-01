@@ -14,4 +14,4 @@ jobs :
           pip install pylint
       - run : |
           black --check --verbose .
-          pylint --check -verbose .
+          pylint $(git ls-files '*.py')
