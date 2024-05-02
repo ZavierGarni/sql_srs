@@ -26,11 +26,12 @@ with st.sidebar:
         con.execute(f"SELECT * FROM memory_state WHERE theme = '{theme}'")
         .df()
         .sort_values("last_reviewed")
+        .reset_index()
     )
     st.write(exercise)
 
     try:
-        exercise_name = exercise.iloc[0]["exercise_name"]
+        exercise_name = exercise.loc[0, "exercise_name"]
     except KeyError as e:
         st.write("Aucune table trouvée pour cet exercice.")
     else:
@@ -57,7 +58,7 @@ if input_text != "":
     tab2, tab3 = st.tabs(["Tables", "Solution"])
 
     with tab2:
-        exercise_tables = exercise.iloc[0]["tables"]
+        exercise_tables = exercise.loc[0, "tables"]
         for table in exercise_tables:
             st.write(f"table : {table}")
             df_tables = con.execute(f"SELECT * FROM {table}").df()
