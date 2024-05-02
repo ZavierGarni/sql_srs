@@ -1,70 +1,55 @@
 import duckdb
-import pandas as pd
 import streamlit as st
-import io
+import ast
 
-csv = """
-beverages, prices
-orange juice, 2.5
-expresso, 4
-tea, 3
-"""
-beverages = pd.read_csv(io.StringIO(csv))
-
-csv2 = """
-food_item, food_price
-cookie, 4
-chocolatine, 2.5
-muffin, 3
-"""
-food_items = pd.read_csv(io.StringIO(csv2))
+con = duckdb.connect(database="data/exercices_sql_tables.duckdb", read_only=False)
 
 answer_str = """
 SELECT * FROM beverages
 CROSS JOIN food_items
 """
 
-solution_df = duckdb.sql(answer_str).df()
-
-
-st.write("Hello World !")
-data = {"a": [1, 2, 3], "b": [4, 5, 6]}
-df = pd.DataFrame(data)
+# solution_df = duckdb.sql(answer_str).df()
 
 with st.sidebar:
-    option = st.selectbox(
-        "What topic are REALLYYY you interested in ?",
-        ("Joins", "GroupBy", "Window Functions"),
+    theme = st.selectbox(
+        "What topic are you interested in ?",
+        ("cross_joins", "GroupBy", "Window Functions"),
         index=None,
         placeholder="Select a topic...",
     )
-    st.write("You have selected : ", option)
+    st.write("You have selected : ", theme)
+
+    exercise = con.execute(f"SELECT * FROM memory_state WHERE theme = '{theme}'").df()
+    st.write(exercise)
 
 input_text = st.text_area(label="Entrez votre input")
 st.write(f"Vous avez entré : {input_text}")
-result = duckdb.query(input_text).df()
+
+result = con.execute(input_text).df()
 st.write(result)
 
-try:
-    result = result[solution_df.columns]
-    st.dataframe(result.compare(solution_df))
-except KeyError as e:
-    st.write("Il manque des colonnes.")
-
-nb_lignes_diff = result.shape[0] - solution_df.shape[0]
-if nb_lignes_diff != 0:
-    st.write(f"Le résultat a une différence de {nb_lignes_diff} avec la solution.")
-
+# try:
+#     result = result[solution_df.columns]
+#     st.dataframe(result.compare(solution_df))
+# except KeyError as e:
+#     st.write("Il manque des colonnes.")
+#
+# nb_lignes_diff = result.shape[0] - solution_df.shape[0]
+# if nb_lignes_diff != 0:
+#     st.write(f"Le résultat a une différence de {nb_lignes_diff} avec la solution.")
 
 tab2, tab3 = st.tabs(["Tables", "Solution"])
 
 with tab2:
-    st.write("Table : beverages")
-    st.dataframe(beverages)
-    st.write("Table : food_items")
-    st.dataframe(food_items)
-    st.write("Expected :")
-    st.dataframe(solution_df)
+    exercise_tables = ast.literal_eval(exercise.loc[0, "tables"])
+    for table in exercise_tables:
+        st.write(f"table : {table}")
+        df_tables = con.execute(f"SELECT * FROM {table}").df()
+        st.dataframe(df_tables)
 
 with tab3:
-    st.write(answer_str)
+    exercise_name = exercise.loc[0, "exercise_name"]
+    with open(f"answers/{exercise_name}.sql", "r") as f:
+        answer = f.read()
+    st.write(answer)
